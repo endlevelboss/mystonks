@@ -1,0 +1,110 @@
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --grid: #e6e8eb;
+  --up: #1f8f84;
+  --down: #d64541;
+  --side: #8a8f98;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --surface: #171a21;
+    --text: #e6e8eb;
+    --muted: #9aa3af;
+    --grid: #262a33;
+    --up: #26a69a;
+    --down: #ef5350;
+    --side: #9aa3af;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+h1 { margin: 0; font-size: 1.4rem; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 16px; color: var(--muted); }
+
+select {
+  font: inherit;
+  padding: 4px 8px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--grid);
+  border-radius: 6px;
+}
+
+main { padding: 0 16px 16px; }
+
+.summary {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.headline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; }
+.sym { font-weight: 700; font-size: 1.2rem; }
+.price { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+
+dl { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 10px 0 0; }
+dl div { display: flex; gap: 8px; }
+dt { color: var(--muted); }
+dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+.badge { font-weight: 600; }
+.badge.up { color: var(--up); }
+.badge.down { color: var(--down); }
+.badge.sideways, .badge.unknown { color: var(--side); }
+
+.chart {
+  height: 60vh;
+  min-height: 320px;
+  background: var(--surface);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.swatch {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-top: 2px solid;
+}
+.swatch.sma20 { border-color: #f5a623; }
+.swatch.sma50 { border-color: #8e6cf0; }
+.swatch.regression { border-color: #3b82f6; }
+.swatch.support { border-top-style: dashed; border-color: #26a69a; }
+.swatch.resistance { border-top-style: dashed; border-color: #ef5350; }
