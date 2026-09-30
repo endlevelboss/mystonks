@@ -24,6 +24,10 @@ Oslo tickers. See README.md for layout and API routes.
   adjusted (use for return calculations — Equinor pays large dividends).
 - Front end is plain JS + TradingView Lightweight Charts **v4** API from unpkg
   (no ClojureScript build). JSON keys are camelCased by the server.
+- v4 has no panes, so RSI/MACD are separate charts synced in `app.js`: every
+  chart gets a (whitespace) point for every candle date so logical ranges match,
+  and all use the same `minimumWidth` price scale so the time axes line up.
+  New indicator panes must follow the same pattern.
 - Tests must not hit the network; use fixtures like `test/stonks/yahoo_test.clj`.
 
 ## Known data quirks
@@ -34,5 +38,5 @@ Oslo tickers. See README.md for layout and API routes.
 
 ## Ideas not done yet
 
-More indicators (RSI, MACD, Bollinger), pattern detection, strategy definitions
+More indicators (Bollinger, etc.), pattern detection, strategy definitions
 and a backtester with P&L stats, more Oslo tickers.

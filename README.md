@@ -45,8 +45,9 @@ clojure -M:test
 | `src/stonks/yahoo.clj` | Yahoo Finance download + parsing |
 | `src/stonks/store.clj` | EDN file cache in `data/`, incremental updates |
 | `src/stonks/data.clj` | Seeded dummy OHLCV generator; preset symbols `DUMMY`, `UPCO`, `DWNR`, `FLAT` |
+| `src/stonks/indicators.clj` | EMA, RSI (Wilder, 14), MACD (12, 26, 9), latest-state summary |
 | `src/stonks/trend.clj` | Linear regression trend, SMAs, swing pivots, support/resistance lines, `analyze` |
-| `src/stonks/server.clj` | Routes: `/`, `/api/symbols`, `/api/stocks/:symbol/{info,candles,analysis?window=N}`, `POST /api/stocks/:symbol/refresh` |
+| `src/stonks/server.clj` | Routes: `/`, `/api/symbols`, `/api/stocks/:symbol/{info,candles,analysis?window=N,indicators}`, `POST /api/stocks/:symbol/refresh` |
 | `src/stonks/views.clj` | HTML page (hiccup) |
 | `resources/public/app.js` | Chart rendering with TradingView Lightweight Charts (v4, via CDN) |
 

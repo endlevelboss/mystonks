@@ -28,12 +28,22 @@
       [:button#refresh {:type "button" :hidden true} "Update data"]]]
     [:main
      [:section#summary.summary]
-     [:div#chart.chart]
-     [:ul.legend
-      [:li [:span.swatch.sma20] "SMA 20"]
-      [:li [:span.swatch.sma50] "SMA 50"]
-      [:li [:span.swatch.regression] "Regression"]
-      [:li [:span.swatch.support] "Support"]
-      [:li [:span.swatch.resistance] "Resistance"]]
+     [:div.charts
+      [:div#chart.chart]
+      [:ul.legend
+       [:li [:span.swatch.sma20] "SMA 20"]
+       [:li [:span.swatch.sma50] "SMA 50"]
+       [:li [:span.swatch.regression] "Regression"]
+       [:li [:span.swatch.support] "Support"]
+       [:li [:span.swatch.resistance] "Resistance"]]
+      [:div.pane
+       [:div.pane-label "RSI 14 "
+        [:span.muted "· overbought above 70, oversold below 30"]]
+       [:div#rsi-chart.chart.small]]
+      [:div.pane
+       [:div.pane-label "MACD 12, 26, 9 "
+        [:span.swatch.macd] "MACD " [:span.swatch.signal] "Signal "
+        [:span.muted "· bars: MACD − signal"]]
+       [:div#macd-chart.chart.small]]]
      [:p#source.source]]
     (include-js "/app.js")]))

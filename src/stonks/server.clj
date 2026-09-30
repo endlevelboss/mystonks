@@ -3,6 +3,7 @@
             [jsonista.core :as j]
             [reitit.ring :as ring]
             [ring.middleware.params :refer [wrap-params]]
+            [stonks.indicators :as indicators]
             [stonks.market :as market]
             [stonks.trend :as trend]
             [stonks.views :as views]))
@@ -71,6 +72,9 @@
                                          (:candles series)
                                          {:window (parse-window
                                                    (get-in req [:query-params "window"]))}))))}]
+       ["/indicators" {:get (with-series
+                              (fn [_ series]
+                                (json 200 (indicators/indicators (:candles series)))))}]
        ["/refresh" {:post (wrap-errors refresh)}]]]])
    (ring/routes
     (ring/create-resource-handler {:path "/"})

@@ -82,12 +82,27 @@ dd { margin: 0; font-variant-numeric: tabular-nums; }
 .badge.sideways, .badge.unknown { color: var(--side); }
 
 .chart {
-  height: 60vh;
+  height: 55vh;
   min-height: 320px;
   background: var(--surface);
   border-radius: 8px;
   overflow: hidden;
 }
+
+.chart.small {
+  height: 160px;
+  min-height: 0;
+}
+
+.pane { margin-top: 12px; }
+
+.pane-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.muted { color: var(--muted); font-weight: normal; }
 
 .legend {
   display: flex;
@@ -113,3 +128,5 @@ dd { margin: 0; font-variant-numeric: tabular-nums; }
 .swatch.regression { border-color: #3b82f6; }
 .swatch.support { border-top-style: dashed; border-color: #26a69a; }
 .swatch.resistance { border-top-style: dashed; border-color: #ef5350; }
+.swatch.macd { border-color: #3b82f6; margin-left: 8px; }
+.swatch.signal { border-color: #f5a623; margin-left: 8px; }
