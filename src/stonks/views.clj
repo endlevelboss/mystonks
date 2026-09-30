@@ -15,13 +15,17 @@
      [:div.controls
       [:label "Symbol "
        [:select#symbol
-        (for [[sym {:keys [name]}] (sort-by key symbols)]
-          [:option {:value sym} (str sym " — " name)])]]
+        (for [[group source] [["Oslo Børs" :yahoo] ["Test data" :dummy]]]
+          [:optgroup {:label group}
+           (for [[sym {:keys [name]}] (sort-by key symbols)
+                 :when (= source (:source (symbols sym)))]
+             [:option {:value sym} (str sym " — " name)])])]]
       [:label "Trend window "
        [:select#window
-        [:option {:value ""} "All"]
-        (for [n [120 60 20]]
-          [:option {:value n} (str "Last " n " days")])]]]]
+        (for [[n label] [[nil "All"] [500 "Last 500 days (~2y)"] [250 "Last 250 days (~1y)"]
+                         [120 "Last 120 days"] [60 "Last 60 days"] [20 "Last 20 days"]]]
+          [:option {:value (str n) :selected (= n 250)} label])]]
+      [:button#refresh {:type "button" :hidden true} "Update data"]]]
     [:main
      [:section#summary.summary]
      [:div#chart.chart]
@@ -30,5 +34,6 @@
       [:li [:span.swatch.sma50] "SMA 50"]
       [:li [:span.swatch.regression] "Regression"]
       [:li [:span.swatch.support] "Support"]
-      [:li [:span.swatch.resistance] "Resistance"]]]
+      [:li [:span.swatch.resistance] "Resistance"]]
+     [:p#source.source]]
     (include-js "/app.js")]))

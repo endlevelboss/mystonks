@@ -7,6 +7,7 @@
         metosin/jsonista {:mvn/version "0.3.10"}}
  :aliases
  {:run {:main-opts ["-m" "stonks.core"]}
+  :fetch {:main-opts ["-m" "stonks.store"]}
   :dev {:extra-paths ["test"]}
   :test {:extra-paths ["test"]
          :main-opts ["-m" "stonks.test-runner"]}}}

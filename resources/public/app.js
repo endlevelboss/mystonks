@@ -63,13 +63,14 @@ function lineSummary(label, l) {
   return `<div><dt>${label}</dt><dd>${badge(l.direction)} ${fmtPct(l.pctPerDay)}</dd></div>`;
 }
 
-function renderSummary(symbol, a, candles) {
+function renderSummary(info, a, candles) {
   const last = candles[candles.length - 1];
   const r = a.regression;
   $('summary').innerHTML = `
     <div class="headline">
-      <span class="sym">${symbol}</span>
-      <span class="price">${last.close.toFixed(2)}</span>
+      <span class="sym">${info.symbol}</span>
+      <span class="name">${info.name}</span>
+      <span class="price">${last.close.toFixed(2)} ${info.currency || ''}</span>
       <span class="trend">Trend ${badge(a.trend)}</span>
     </div>
     <dl>
@@ -81,11 +82,21 @@ function renderSummary(symbol, a, candles) {
     </dl>`;
 }
 
+function renderSource(info) {
+  const real = info.source === 'yahoo';
+  $('refresh').hidden = !real;
+  $('source').textContent = real
+    ? `Source: Yahoo Finance · ${info.count} trading days, ${info.firstDate} → ${info.lastDate}` +
+      ` · downloaded ${new Date(info.fetchedAt).toLocaleString()}`
+    : 'Source: generated test data';
+}
+
 async function load() {
   const symbol = $('symbol').value;
-  const windowDays = $('window').value;
+  const windowDays = Number($('window').value) || null;
   const q = windowDays ? `?window=${windowDays}` : '';
-  const [candles, a] = await Promise.all([
+  const [info, candles, a] = await Promise.all([
+    getJson(`/api/stocks/${symbol}/info`),
     getJson(`/api/stocks/${symbol}/candles`),
     getJson(`/api/stocks/${symbol}/analysis${q}`),
   ]);
@@ -112,11 +123,41 @@ async function load() {
     size: 0.6,
   })));
 
-  renderSummary(symbol, a, candles);
-  // Wait a frame so autoSize has measured the container before fitting.
-  requestAnimationFrame(() => chart.timeScale().fitContent());
+  renderSummary(info, a, candles);
+  renderSource(info);
+  // Wait a frame so autoSize has measured the container before zooming.
+  requestAnimationFrame(() => {
+    const n = candles.length;
+    if (windowDays && windowDays < n) {
+      // Show the analysed window plus some context before it.
+      chart.timeScale().setVisibleLogicalRange({ from: n - windowDays * 1.3, to: n + 2 });
+    } else {
+      chart.timeScale().fitContent();
+    }
+  });
 }
 
-$('symbol').addEventListener('change', load);
-$('window').addEventListener('change', load);
-load().catch((e) => { $('summary').textContent = `Failed to load: ${e.message}`; });
+function showError(e) {
+  $('summary').textContent = `Failed: ${e.message}`;
+}
+
+async function refresh() {
+  const button = $('refresh');
+  button.disabled = true;
+  button.textContent = 'Updating…';
+  try {
+    const res = await fetch(`/api/stocks/${$('symbol').value}/refresh`, { method: 'POST' });
+    if (!res.ok) throw new Error((await res.json()).error || res.status);
+    await load();
+  } catch (e) {
+    showError(e);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Update data';
+  }
+}
+
+$('symbol').addEventListener('change', () => load().catch(showError));
+$('window').addEventListener('change', () => load().catch(showError));
+$('refresh').addEventListener('click', refresh);
+load().catch(showError);

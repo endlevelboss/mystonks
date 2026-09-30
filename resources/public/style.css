@@ -44,7 +44,7 @@ h1 { margin: 0; font-size: 1.4rem; }
 
 .controls { display: flex; flex-wrap: wrap; gap: 16px; color: var(--muted); }
 
-select {
+select, button {
   font: inherit;
   padding: 4px 8px;
   background: var(--surface);
@@ -63,7 +63,12 @@ main { padding: 0 16px 16px; }
 }
 
 .headline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; }
+button { cursor: pointer; }
+button:disabled { cursor: progress; opacity: 0.6; }
+
 .sym { font-weight: 700; font-size: 1.2rem; }
+.name { color: var(--muted); }
+.source { color: var(--muted); font-size: 0.85rem; margin: 8px 0 0; }
 .price { font-size: 1.2rem; font-variant-numeric: tabular-nums; }
 
 dl { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 10px 0 0; }

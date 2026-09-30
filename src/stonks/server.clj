@@ -3,7 +3,7 @@
             [jsonista.core :as j]
             [reitit.ring :as ring]
             [ring.middleware.params :refer [wrap-params]]
-            [stonks.data :as data]
+            [stonks.market :as market]
             [stonks.trend :as trend]
             [stonks.views :as views]))
 
@@ -18,37 +18,60 @@
    :headers {"Content-Type" "application/json"}
    :body (j/write-value-as-string body mapper)})
 
-(defn- with-candles
-  "Wrap a handler (fn [req candles]) with symbol lookup and 404 handling."
+(defn- symbol-param [req]
+  (str/upper-case (get-in req [:path-params :symbol])))
+
+(defn- wrap-errors
+  "Report failures (e.g. the data source being unreachable) as JSON."
   [handler]
   (fn [req]
-    (let [sym (str/upper-case (get-in req [:path-params :symbol]))]
-      (if-let [candles (data/series sym)]
-        (handler req candles)
-        (json 404 {:error (str "Unknown symbol " sym)})))))
+    (try
+      (handler req)
+      (catch Exception e
+        (json 502 {:error (ex-message e)})))))
+
+(defn- with-series
+  "Wrap a handler (fn [req series]) with symbol lookup and 404 handling."
+  [handler]
+  (wrap-errors
+   (fn [req]
+     (let [sym (symbol-param req)]
+       (if-let [series (market/series sym)]
+         (handler req series)
+         (json 404 {:error (str "Unknown symbol " sym)}))))))
 
 (defn- parse-window [s]
   (when-let [n (some-> s parse-long)]
     (when (>= n 10) n)))
+
+(defn- refresh [req]
+  (let [sym (symbol-param req)]
+    (if-not (market/symbols sym)
+      (json 404 {:error (str "Unknown symbol " sym)})
+      (if-let [series (market/refresh! sym)]
+        (json 200 (market/info series))
+        (json 400 {:error (str sym " is generated test data")})))))
 
 (def app
   (ring/ring-handler
    (ring/router
     [["/" {:get (fn [_] {:status 200
                          :headers {"Content-Type" "text/html; charset=utf-8"}
-                         :body (views/index-page data/symbols)})}]
+                         :body (views/index-page market/symbols)})}]
      ["/api"
       ["/symbols" {:get (fn [_]
-                          (json 200 (for [[sym {:keys [name]}] (sort-by key data/symbols)]
-                                      {:symbol sym :name name})))}]
+                          (json 200 (for [[sym {:keys [name source]}] (sort-by key market/symbols)]
+                                      {:symbol sym :name name :source source})))}]
       ["/stocks/:symbol"
-       ["/candles" {:get (with-candles (fn [_ candles] (json 200 candles)))}]
-       ["/analysis" {:get (with-candles
-                            (fn [req candles]
+       ["/info" {:get (with-series (fn [_ series] (json 200 (market/info series))))}]
+       ["/candles" {:get (with-series (fn [_ series] (json 200 (:candles series))))}]
+       ["/analysis" {:get (with-series
+                            (fn [req series]
                               (json 200 (trend/analyze
-                                         candles
+                                         (:candles series)
                                          {:window (parse-window
-                                                   (get-in req [:query-params "window"]))}))))}]]]])
+                                                   (get-in req [:query-params "window"]))}))))}]
+       ["/refresh" {:post (wrap-errors refresh)}]]]])
    (ring/routes
     (ring/create-resource-handler {:path "/"})
     (ring/create-default-handler))
